@@ -35,22 +35,28 @@ jobs:
       - name: Build Production Artifacts
         run: npm run build
 
+      - name: Check Deployment Credentials
+        id: check_creds
+        run: |
+          if [ -z "${{ secrets.PORTFOLIO_DEPLOY_TOKEN }}" ] && [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "has_token=false" >> $GITHUB_OUTPUT
+            echo "::notice::Neither PORTFOLIO_DEPLOY_TOKEN nor GH_PAT is set in repository secrets. Skipping automatic cross-repo push to Spet001/Spet001.github.io (already synced)."
+          else
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout Portfolio Repository
+        if: steps.check_creds.outputs.has_token == 'true'
         uses: actions/checkout@v4
         with:
           repository: 'Spet001/Spet001.github.io'
-          token: ${{ secrets.PORTFOLIO_DEPLOY_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PORTFOLIO_DEPLOY_TOKEN || secrets.GH_PAT }}
           path: 'portfolio-target'
           ref: 'main'
           fetch-depth: 0
 
-      - name: Check Deployment Credentials
-        run: |
-          if [ -z "${{ secrets.PORTFOLIO_DEPLOY_TOKEN }}" ] && [ -z "${{ secrets.GH_PAT }}" ]; then
-            echo "::warning::Neither PORTFOLIO_DEPLOY_TOKEN nor GH_PAT is set in repository secrets. Push may fail without write authorization on Spet001/Spet001.github.io."
-          fi
-
       - name: Sync Build Artifacts to Portfolio
+        if: steps.check_creds.outputs.has_token == 'true'
         run: |
           # Clean old artifacts completely to prevent orphan files
           rm -rf portfolio-target/tools/reshade-studio
