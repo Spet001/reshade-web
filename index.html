@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spet's ReShade Studio — Deterministic CIE LAB Color Transfer, 3D LUT & ReShade .ini Compiler</title>
+    <meta name="description" content="100% deterministic client-side CIE LAB Reinhard statistical color transfer, RGB histogram analyzer, PS1 15-bit RGB555 Bayer dither engine, 3D LUT (1024x32 SpetLUT.png) generator, and ReShade 6.8.0 bundle (.ZIP + .ini + .fx + DLL) compiler." />
+    <meta name="keywords" content="Spet's ReShade Studio, Eduardo Gelain, SpetDev, ReShade Preset Generator, 3D LUT Generator, CIE LAB Color Transfer, Reinhard Color Matching, PS1 RGB555 Dither, Anti-Piss Filter, ReShade 6.8.0, HLSL Shaders" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://spet01.dev/tools/reshade-studio/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://spet01.dev/tools/reshade-studio/" />
+    <meta property="og:title" content="Spet's ReShade Studio — Deterministic CIE LAB Color Match & 3D LUT Compiler" />
+    <meta property="og:description" content="100% math-driven client-side ReShade preset & 3D LUT generator. Match any reference frame via CIE LAB statistical transfer, preview live in split-screen, and export ready-to-drop ReShade 6.8.0 bundles." />
+    <meta property="og:image" content="https://spet01.dev/assets/tool_reshade_studio.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://spet01.dev/tools/reshade-studio/" />
+    <meta name="twitter:title" content="Spet's ReShade Studio — Deterministic CIE LAB Color Match & 3D LUT Compiler" />
+    <meta name="twitter:description" content="100% math-driven client-side ReShade preset & 3D LUT generator. Match any reference frame via CIE LAB statistical transfer and export complete ReShade 6.8.0 bundles." />
+    <meta name="twitter:image" content="https://spet01.dev/assets/tool_reshade_studio.jpg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-[#0B0F17] text-[#F1F5F9] antialiased selection:bg-[#F59E0B]/30 selection:text-[#FDE68A]">
+    <div id="root">
+      <header style="padding: 1.5rem; border-bottom: 1px solid #2A3242; background: #0B0F17;">
+        <h1 style="font-size: 1.25rem; font-weight: 700; color: #E05A3A; margin: 0 0 0.5rem 0; font-family: monospace;">Spet's ReShade Studio (v1.0.0)</h1>
+        <p style="font-size: 0.875rem; color: #94a3b8; margin: 0; line-height: 1.5;">Deterministic client-side CIE LAB statistical color transfer, RGB histogram solver, 3D LUT generator, and ReShade 6.8.0 preset bundle compiler.</p>
+      </header>
+      <main style="padding: 1.5rem; max-width: 900px; margin: 0 auto; font-family: monospace; line-height: 1.6; color: #cbd5e1;">
+        <section style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1rem; color: #f8fafc; margin-bottom: 0.5rem;">100% Mathematical Color Science (Zero AI Hallucinations)</h2>
+          <p style="font-size: 0.875rem; color: #94a3b8;">Upload a clean game screenshot and a target reference image (or select standalone filters like PSX 15-bit RGB555 Bayer Dither, 7th-Gen Anti-Piss Filter, or Next-Gen PBR Filmic ACES). Computes exact LiftGammaGain.fx, Levels.fx, Curves.fx, Tonemap.fx, LumaSharpen.fx, Clarity.fx, and 32x32x32 3D LUTs (1024x32 SpetLUT.png) directly in your browser.</p>
+        </section>
+        <p style="font-size: 0.75rem; color: #64748b;">Loading interactive ReShade Studio workstation...</p>
+      </main>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

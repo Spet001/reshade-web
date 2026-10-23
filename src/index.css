@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: #0B0F17;
+    color: #F1F5F9;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Industrial-Technical Mechanical Cross-Hatch Backgrounds */
+.bg-industrial-base {
+  background-color: #0B0F17;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.018) 0px,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.018) 0px,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 8px
+    );
+}
+
+.bg-industrial-panel {
+  background-color: #141820;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.014) 0px,
+      rgba(255, 255, 255, 0.014) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.22) 0px,
+      rgba(0, 0, 0, 0.22) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+}
+
+/* High-Precision Sharp-Edged Bevelled Borders */
+.bevel-panel {
+  border-radius: 0px;
+  background-color: #141820;
+  border: 1px solid #2A3242;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.07),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.7);
+}
+
+.bevel-recessed {
+  border-radius: 0px;
+  background-color: #0B0F17;
+  border: 1px solid #232A38;
+  box-shadow:
+    inset 1px 1px 2px rgba(0, 0, 0, 0.8),
+    inset -1px -1px 0px rgba(255, 255, 255, 0.04);
+}
+
+.bevel-btn {
+  border-radius: 0px;
+  background-color: #181E29;
+  border: 1px solid #2E3748;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.08),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.65);
+}
+
+.bevel-btn:hover {
+  background-color: #1E2634;
+  border-color: #3E4A61;
+}
+
+.bevel-accent {
+  border-radius: 0px;
+  background-color: #E05A3A;
+  border: 1px solid #F2785C;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.28),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.5);
+}
+
+.bevel-accent:hover {
+  background-color: #EC6443;
+}
+
+.bevel-viewport {
+  border-radius: 0px;
+  background-color: #0B0F17;
+  border: 1px solid #333D52;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.12),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.85),
+    0 20px 45px rgba(0, 0, 0, 0.75);
+}
+
+/* Custom Sharp-Edged Industrial Range Sliders */
+input[type="range"].foundry-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #0B0F17;
+  border: 1px solid #283142;
+  border-radius: 0px;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.8);
+  outline: none;
+}
+
+input[type="range"].foundry-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 16px;
+  border-radius: 0px;
+  background: #E05A3A;
+  border: 1px solid #FFE4DC;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  transition: transform 120ms ease-out, background-color 120ms ease-out;
+}
+
+input[type="range"].foundry-slider::-webkit-slider-thumb:hover {
+  background: #F26B4B;
+  transform: scaleY(1.08);
+}
+
+/* Custom Industrial-Technical Scrollbar for Inspector Sidebar */
+.industrial-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #2E384D #0B0F17;
+}
+
+.industrial-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.industrial-scrollbar::-webkit-scrollbar-track {
+  background-color: #0B0F17;
+  border-left: 1px solid #232A38;
+  border-radius: 0px;
+  box-shadow: inset 1px 0 2px rgba(0, 0, 0, 0.85);
+}
+
+.industrial-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #262F40;
+  border: 1px solid #3B475E;
+  border-radius: 0px;
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.12),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.7);
+}
+
+.industrial-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #E05A3A;
+  border-color: #F2785C;
+}
+
+.industrial-scrollbar::-webkit-scrollbar-corner {
+  background-color: #0B0F17;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

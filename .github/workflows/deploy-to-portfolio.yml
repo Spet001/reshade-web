@@ -1,0 +1,85 @@
+name: Deploy ReShade Studio to Portfolio
+
+'on':
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 'portfolio-deploy-reshade-studio'
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Tool Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Test Suite
+        run: npm test
+
+      - name: Build Production Artifacts
+        run: npm run build
+
+      - name: Checkout Portfolio Repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'Spet001/Spet001.github.io'
+          token: ${{ secrets.PORTFOLIO_DEPLOY_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          path: 'portfolio-target'
+          ref: 'main'
+          fetch-depth: 0
+
+      - name: Check Deployment Credentials
+        run: |
+          if [ -z "${{ secrets.PORTFOLIO_DEPLOY_TOKEN }}" ] && [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "::warning::Neither PORTFOLIO_DEPLOY_TOKEN nor GH_PAT is set in repository secrets. Push may fail without write authorization on Spet001/Spet001.github.io."
+          fi
+
+      - name: Sync Build Artifacts to Portfolio
+        run: |
+          # Clean old artifacts completely to prevent orphan files
+          rm -rf portfolio-target/tools/reshade-studio
+          mkdir -p portfolio-target/tools/reshade-studio
+          # Copy all build artifacts into destination directory
+          cp -a dist/. portfolio-target/tools/reshade-studio/
+
+          cd portfolio-target
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tools/reshade-studio
+
+          if git diff --staged --quiet; then
+            echo "No artifact changes detected. Skipping commit."
+          else
+            git commit -m "chore(tools): update reshade-studio build artifacts"
+            pushed=0
+            for i in 1 2 3 4 5; do
+              if git push origin main; then
+                pushed=1
+                echo "Successfully pushed artifacts to Spet001/Spet001.github.io on attempt $i."
+                break
+              fi
+              echo "Push failed on attempt $i. Rebasing against latest origin/main..."
+              git pull --rebase origin main
+              sleep 3
+            done
+            if [ "$pushed" -ne 1 ]; then
+              echo "Error: Failed to push artifacts to Spet001/Spet001.github.io after 5 attempts."
+              exit 1
+            fi
+          fi
