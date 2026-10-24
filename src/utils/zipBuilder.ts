@@ -1,12 +1,7 @@
-/**
- * Deterministic PKZIP (ZIP 2.0 Store Mode with IEEE 802.3 CRC-32) Archive Builder.
- * Produces standard .zip archives compatible with Windows Explorer, 7-Zip, WinRAR, and macOS/Linux unzip.
- */
-
 export interface ZipFileEntry {
-  /** Relative path inside the ZIP archive (use forward slashes, e.g. "reshade-shaders/Textures/SpetLUT.png") */
+
   path: string;
-  /** File content as string (UTF-8) or raw bytes (Uint8Array) */
+
   data: string | Uint8Array;
 }
 
@@ -30,9 +25,6 @@ export function computeCrc32(bytes: Uint8Array): number {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-/**
- * Builds a complete, valid .zip archive as a Uint8Array from a list of files.
- */
 export function buildZipArchive(entries: ZipFileEntry[]): Uint8Array {
   const encoder = new TextEncoder();
 
@@ -61,18 +53,15 @@ export function buildZipArchive(entries: ZipFileEntry[]): Uint8Array {
       offset: localTotalSize,
     });
 
-    // Local file header (30 bytes) + file name + file data
     localTotalSize += 30 + nameBytes.length + dataBytes.length;
-    // Central directory header (46 bytes) + file name
+
     centralTotalSize += 46 + nameBytes.length;
   }
 
-  // End of central directory record = 22 bytes
   const totalSize = localTotalSize + centralTotalSize + 22;
   const out = new Uint8Array(totalSize);
   const view = new DataView(out.buffer);
 
-  // Real-time MS-DOS timestamp so ReShade 6.8.0 and Windows/WinRAR always detect updated .fx and .ini files
   const now = new Date();
   const dosTime =
     ((now.getHours() & 0x1f) << 11) |
@@ -85,22 +74,21 @@ export function buildZipArchive(entries: ZipFileEntry[]): Uint8Array {
 
   let ptr = 0;
 
-  // 1. Write Local File Headers + Data
   for (const item of prepared) {
     const len = item.dataBytes.length;
     const nameLen = item.nameBytes.length;
 
-    view.setUint32(ptr, 0x04034b50, true); // Local file header signature
-    view.setUint16(ptr + 4, 20, true); // Version needed to extract (2.0)
-    view.setUint16(ptr + 6, 0x0800, true); // General purpose bit flag (UTF-8 filename)
-    view.setUint16(ptr + 8, 0, true); // Compression method (0 = Store)
-    view.setUint16(ptr + 10, dosTime, true); // Last mod file time
-    view.setUint16(ptr + 12, dosDate, true); // Last mod file date
-    view.setUint32(ptr + 14, item.crc32, true); // CRC-32
-    view.setUint32(ptr + 18, len, true); // Compressed size
-    view.setUint32(ptr + 22, len, true); // Uncompressed size
-    view.setUint16(ptr + 26, nameLen, true); // File name length
-    view.setUint16(ptr + 28, 0, true); // Extra field length
+    view.setUint32(ptr, 0x04034b50, true);
+    view.setUint16(ptr + 4, 20, true);
+    view.setUint16(ptr + 6, 0x0800, true);
+    view.setUint16(ptr + 8, 0, true);
+    view.setUint16(ptr + 10, dosTime, true);
+    view.setUint16(ptr + 12, dosDate, true);
+    view.setUint32(ptr + 14, item.crc32, true);
+    view.setUint32(ptr + 18, len, true);
+    view.setUint32(ptr + 22, len, true);
+    view.setUint16(ptr + 26, nameLen, true);
+    view.setUint16(ptr + 28, 0, true);
     ptr += 30;
 
     out.set(item.nameBytes, ptr);
@@ -112,52 +100,45 @@ export function buildZipArchive(entries: ZipFileEntry[]): Uint8Array {
 
   const centralDirOffset = ptr;
 
-  // 2. Write Central Directory Headers
   for (const item of prepared) {
     const len = item.dataBytes.length;
     const nameLen = item.nameBytes.length;
 
-    view.setUint32(ptr, 0x02014b50, true); // Central directory file header signature
-    view.setUint16(ptr + 4, 20, true); // Version made by
-    view.setUint16(ptr + 6, 20, true); // Version needed to extract
-    view.setUint16(ptr + 8, 0x0800, true); // General purpose bit flag (UTF-8)
-    view.setUint16(ptr + 10, 0, true); // Compression method (Store)
-    view.setUint16(ptr + 12, dosTime, true); // Last mod time
-    view.setUint16(ptr + 14, dosDate, true); // Last mod date
-    view.setUint32(ptr + 16, item.crc32, true); // CRC-32
-    view.setUint32(ptr + 20, len, true); // Compressed size
-    view.setUint32(ptr + 24, len, true); // Uncompressed size
-    view.setUint16(ptr + 28, nameLen, true); // File name length
-    view.setUint16(ptr + 30, 0, true); // Extra field length
-    view.setUint16(ptr + 32, 0, true); // File comment length
-    view.setUint16(ptr + 34, 0, true); // Disk number start
-    view.setUint16(ptr + 36, 0, true); // Internal file attributes
-    view.setUint32(ptr + 38, 0, true); // External file attributes
-    view.setUint32(ptr + 42, item.offset, true); // Relative offset of local header
+    view.setUint32(ptr, 0x02014b50, true);
+    view.setUint16(ptr + 4, 20, true);
+    view.setUint16(ptr + 6, 20, true);
+    view.setUint16(ptr + 8, 0x0800, true);
+    view.setUint16(ptr + 10, 0, true);
+    view.setUint16(ptr + 12, dosTime, true);
+    view.setUint16(ptr + 14, dosDate, true);
+    view.setUint32(ptr + 16, item.crc32, true);
+    view.setUint32(ptr + 20, len, true);
+    view.setUint32(ptr + 24, len, true);
+    view.setUint16(ptr + 28, nameLen, true);
+    view.setUint16(ptr + 30, 0, true);
+    view.setUint16(ptr + 32, 0, true);
+    view.setUint16(ptr + 34, 0, true);
+    view.setUint16(ptr + 36, 0, true);
+    view.setUint32(ptr + 38, 0, true);
+    view.setUint32(ptr + 42, item.offset, true);
     ptr += 46;
 
     out.set(item.nameBytes, ptr);
     ptr += nameLen;
   }
 
-  // 3. Write End of Central Directory Record (EOCD)
-  view.setUint32(ptr, 0x06054b50, true); // EOCD signature
-  view.setUint16(ptr + 4, 0, true); // Number of this disk
-  view.setUint16(ptr + 6, 0, true); // Disk where central directory starts
-  view.setUint16(ptr + 8, prepared.length, true); // Total entries on this disk
-  view.setUint16(ptr + 10, prepared.length, true); // Total entries in central directory
-  view.setUint32(ptr + 12, centralTotalSize, true); // Size of central directory
-  view.setUint32(ptr + 16, centralDirOffset, true); // Offset of central directory
-  view.setUint16(ptr + 20, 0, true); // Comment length
+  view.setUint32(ptr, 0x06054b50, true);
+  view.setUint16(ptr + 4, 0, true);
+  view.setUint16(ptr + 6, 0, true);
+  view.setUint16(ptr + 8, prepared.length, true);
+  view.setUint16(ptr + 10, prepared.length, true);
+  view.setUint32(ptr + 12, centralTotalSize, true);
+  view.setUint32(ptr + 16, centralDirOffset, true);
+  view.setUint16(ptr + 20, 0, true);
 
   return out;
 }
 
-/**
- * Generates a minimal valid PE32/PE64 ReShade proxy DLL binary header stub
- * with embedded metadata for the target graphics API so users have the exact DLL filename
- * in their extracted package alongside ReShade.ini and reshade-shaders/.
- */
 export function buildReShadeProxyDllStub(
   dllName: string,
   apiLabel: string,
@@ -177,17 +158,17 @@ export function buildReShadeProxyDllStub(
 
   const payload = encoder.encode(banner);
   const buffer = new Uint8Array(256 + payload.length);
-  // Standard MZ DOS header magic bytes (0x4D, 0x5A)
-  buffer[0] = 0x4d; // 'M'
-  buffer[1] = 0x5a; // 'Z'
+
+  buffer[0] = 0x4d;
+  buffer[1] = 0x5a;
   buffer[2] = 0x90;
-  buffer[0x3c] = 0x80; // e_lfanew offset
-  // PE\0\0 signature at 0x80
-  buffer[0x80] = 0x50; // 'P'
-  buffer[0x81] = 0x45; // 'E'
+  buffer[0x3c] = 0x80;
+
+  buffer[0x80] = 0x50;
+  buffer[0x81] = 0x45;
   buffer[0x82] = 0x00;
   buffer[0x83] = 0x00;
-  // Machine type: 0x014c (IMAGE_FILE_MACHINE_I386) or 0x8664 (IMAGE_FILE_MACHINE_AMD64)
+
   if (arch === '64-bit') {
     buffer[0x84] = 0x64;
     buffer[0x85] = 0x86;
@@ -201,10 +182,6 @@ export function buildReShadeProxyDllStub(
 
 const dllBinaryCache: Partial<Record<'32-bit' | '64-bit', Uint8Array>> = {};
 
-/**
- * Fetches the official signed ReShade 6.8.0 binary (ReShade64.dll or ReShade32.dll)
- * from /reshade/ so the exported .ZIP contains the real working ReShade hook DLL.
- */
 export async function fetchOfficialReShadeDllBytes(
   arch: '32-bit' | '64-bit',
   dllName: string,
@@ -222,26 +199,21 @@ export async function fetchOfficialReShadeDllBytes(
     if (response.ok) {
       const arrayBuffer = await response.arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
-      // Verify genuine MZ header and >1MB payload size
+
       if (bytes.byteLength > 1000000 && bytes[0] === 0x4d && bytes[1] === 0x5a) {
         dllBinaryCache[arch] = bytes;
         return bytes;
       }
     }
   } catch {
-    // Fallback only in non-browser unit test environments
+
   }
 
   return buildReShadeProxyDllStub(dllName, apiLabel, arch, gameTitle);
 }
 
-/**
- * Generates the official ReShade.fxh HLSL include header so all bundled shaders
- * compile cleanly inside ReShade 6.8.0 without external shader repositories.
- */
 export function buildReShadeFxhSource(): string {
-  return `// Official ReShade.fxh Core Header (CC0-1.0)
-#pragma once
+  return `#pragma once
 
 #define BUFFER_PIXEL_SIZE float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT)
 #define BUFFER_SCREEN_SIZE float2(BUFFER_WIDTH, BUFFER_HEIGHT)
@@ -272,14 +244,8 @@ void PostProcessVS(in uint id : SV_VertexID, out float4 position : SV_Position, 
 `;
 }
 
-/**
- * Generates the standard ReShade HLSL LUT.fx shader so the exported .zip works out of the box.
- */
 export function buildLutFxShaderSource(): string {
-  return `// Spet's ReShade Studio - Unified 3D LUT + PSX Hardware Pixelation & RGB555 Shader (LUT.fx)
-// Automatically reads reshade-shaders/Textures/SpetLUT.png (1024x32, 32 slices)
-
-#include "ReShade.fxh"
+  return `#include "ReShade.fxh"
 
 #ifndef fLUT_TextureName
   #define fLUT_TextureName "SpetLUT.png"
@@ -420,14 +386,8 @@ technique LUT {
 `;
 }
 
-/**
- * Builds all HLSL shader files referenced by Preset.ini so extracting the .ZIP
- * into a clean game folder compiles every technique in ReShade 6.8.0 with zero errors.
- */
 export function buildReShadeShaderEntries(): ZipFileEntry[] {
-  const pixelateFx = `// Spet's ReShade Studio - Resolution-Adaptive Retro Pixelation Shader (Pixelate.fx)
-// Supports continuous float cell sizes (e.g. 2.55) and optional resolution scaling (BUFFER_HEIGHT / 1080.0).
-#include "ReShade.fxh"
+  const pixelateFx = `#include "ReShade.fxh"
 
 #ifndef SPET_PSX_SCALE
   #define SPET_PSX_SCALE 2.55
@@ -468,7 +428,6 @@ void PS_Pixelate(float4 vpos : SV_Position, float2 texcoord : TEXCOORD, out floa
   float2 blockCenter = (blockCoord + 0.5) * effScale;
   float2 rcpScreen = float2(BUFFER_RCP_WIDTH, BUFFER_RCP_HEIGHT);
 
-  // Tight 4-tap sub-cell antialiasing inside each block prevents fractional float moire while keeping block edges razor-sharp
   float2 d = effScale * 0.18;
   float3 c0 = tex2D(ReShade::BackBuffer, (blockCenter + float2(-d.x, -d.y)) * rcpScreen).rgb;
   float3 c1 = tex2D(ReShade::BackBuffer, (blockCenter + float2( d.x, -d.y)) * rcpScreen).rgb;
@@ -486,8 +445,7 @@ technique Pixelate {
 }
 `;
 
-  const ditherFx = `// Spet's ReShade Studio - PSX Hardware RGB555 + 4x4 Ordered Bayer Dither (Dither.fx)
-#include "ReShade.fxh"
+  const ditherFx = `#include "ReShade.fxh"
 
 #ifndef SPET_LUT_HANDLES_PSX
   #define SPET_LUT_HANDLES_PSX 0
@@ -561,8 +519,7 @@ technique Dither {
 }
 `;
 
-  const lumaSharpenFx = `// Spet's ReShade Studio - LumaSharpen (LumaSharpen.fx)
-#include "ReShade.fxh"
+  const lumaSharpenFx = `#include "ReShade.fxh"
 
 uniform float sharp_strength <
   ui_type = "slider";
@@ -616,8 +573,7 @@ technique LumaSharpen {
 }
 `;
 
-  const clarityFx = `// Spet's ReShade Studio - Midtone Micro-Contrast Clarity (Clarity.fx)
-#include "ReShade.fxh"
+  const clarityFx = `#include "ReShade.fxh"
 
 uniform int ClarityRadius < ui_type = "slider"; ui_min = 1; ui_max = 8; > = 3;
 uniform int ClarityBlendMode < ui_type = "slider"; ui_min = 0; ui_max = 3; > = 2;
@@ -656,8 +612,7 @@ technique Clarity {
 }
 `;
 
-  const levelsFx = `// Spet's ReShade Studio - Levels (Levels.fx)
-#include "ReShade.fxh"
+  const levelsFx = `#include "ReShade.fxh"
 #ifndef SPET_LUT_BAKED_PIPELINE
   #define SPET_LUT_BAKED_PIPELINE 0
 #endif
@@ -684,8 +639,7 @@ technique Levels {
 }
 `;
 
-  const liftGammaGainFx = `// Spet's ReShade Studio - LiftGammaGain (LiftGammaGain.fx)
-#include "ReShade.fxh"
+  const liftGammaGainFx = `#include "ReShade.fxh"
 #ifndef SPET_LUT_BAKED_PIPELINE
   #define SPET_LUT_BAKED_PIPELINE 0
 #endif
@@ -712,8 +666,7 @@ technique LiftGammaGain {
 }
 `;
 
-  const curvesFx = `// Spet's ReShade Studio - Curves (Curves.fx)
-#include "ReShade.fxh"
+  const curvesFx = `#include "ReShade.fxh"
 #ifndef SPET_LUT_BAKED_PIPELINE
   #define SPET_LUT_BAKED_PIPELINE 0
 #endif
@@ -739,8 +692,7 @@ technique Curves {
 }
 `;
 
-  const tonemapFx = `// Spet's ReShade Studio - Tonemap (Tonemap.fx)
-#include "ReShade.fxh"
+  const tonemapFx = `#include "ReShade.fxh"
 #ifndef SPET_LUT_BAKED_PIPELINE
   #define SPET_LUT_BAKED_PIPELINE 0
 #endif
@@ -771,8 +723,7 @@ technique Tonemap {
 }
 `;
 
-  const vibranceFx = `// Spet's ReShade Studio - Vibrance (Vibrance.fx)
-#include "ReShade.fxh"
+  const vibranceFx = `#include "ReShade.fxh"
 #ifndef SPET_LUT_BAKED_PIPELINE
   #define SPET_LUT_BAKED_PIPELINE 0
 #endif
@@ -801,8 +752,7 @@ technique Vibrance {
 }
 `;
 
-  const technicolor2Fx = `// Spet's ReShade Studio - Technicolor2 (Technicolor2.fx)
-#include "ReShade.fxh"
+  const technicolor2Fx = `#include "ReShade.fxh"
 #ifndef SPET_LUT_BAKED_PIPELINE
   #define SPET_LUT_BAKED_PIPELINE 0
 #endif
@@ -829,10 +779,7 @@ technique Technicolor2 {
 }
 `;
 
-  const uiMaskFx = `// Spet's ReShade Studio - Intelligent UI, HUD, Main Menu & Pause Menu Guard (UIMask.fx)
-// KeepUI_Pre captures the pristine native frame before shaders run.
-// KeepUI_Post automatically detects Main Menus, Pause Screens, Top/Side UI Bars, and 1px UI Text to restore native sharpness.
-#include "ReShade.fxh"
+  const uiMaskFx = `#include "ReShade.fxh"
 
 uniform int iUIMask_Enable <
   ui_type = "slider";
@@ -904,7 +851,6 @@ void PS_KeepUI_Post(float4 vpos : SV_Position, float2 texcoord : TEXCOORD, out f
   float3 origColor = tex2D(SamplerSpetOrigBackBuffer, texcoord).rgb;
   float uiMask = 0.0;
 
-  // 1. Top Menu Bar & Bottom Status Bar Safe Zones
   if (texcoord.y < fUIMask_TopBarHeight) {
     uiMask = 1.0;
   }
@@ -912,7 +858,6 @@ void PS_KeepUI_Post(float4 vpos : SV_Position, float2 texcoord : TEXCOORD, out f
     uiMask = 1.0;
   }
 
-  // 2. Automatic 4:3 Pillarbox Side Overlay Guard (keeps Discord icon, clock, and sidebar UI sharp)
   if (iUIMask_PillarboxGuard == 1 && (texcoord.x < 0.155 || texcoord.x > 0.845)) {
     float3 leftProbe = tex2D(SamplerSpetOrigBackBuffer, float2(0.05, 0.50)).rgb;
     float3 rightProbe = tex2D(SamplerSpetOrigBackBuffer, float2(0.95, 0.50)).rgb;
@@ -923,7 +868,6 @@ void PS_KeepUI_Post(float4 vpos : SV_Position, float2 texcoord : TEXCOORD, out f
     }
   }
 
-  // 3. Automatic Main Menu, Pause Screen & Loading Screen Detector (9-point viewport probe)
   if (iUIMask_AutoMenuBypass == 1 && uiMask < 0.99) {
     float3 c0 = tex2D(SamplerSpetOrigBackBuffer, float2(0.30, 0.25)).rgb;
     float3 c1 = tex2D(SamplerSpetOrigBackBuffer, float2(0.50, 0.25)).rgb;
@@ -979,7 +923,6 @@ void PS_KeepUI_Post(float4 vpos : SV_Position, float2 texcoord : TEXCOORD, out f
     }
   }
 
-  // 4. In-Game HUD, Bottom Interaction Prompts & Center Pause Modal Box Guard (never touches 3D world pixels during gameplay)
   if (iUIMask_HudProtection == 1 && uiMask < 0.99) {
     float2 px4 = BUFFER_PIXEL_SIZE * 4.0;
     float3 n4 = tex2D(SamplerSpetOrigBackBuffer, texcoord + float2(0.0, -px4.y)).rgb;
@@ -996,21 +939,18 @@ void PS_KeepUI_Post(float4 vpos : SV_Position, float2 texcoord : TEXCOORD, out f
     float minLuma4 = min(min(ln4, ls4), min(lw4, le4));
     float maxLuma4 = max(max(ln4, ls4), max(lw4, le4));
 
-    // Protect top-left HUD portrait & healthbar frame
     if (texcoord.x >= 0.17 && texcoord.x <= 0.37 && texcoord.y >= 0.14 && texcoord.y <= 0.29) {
       if (origLuma < 0.045 || minLuma4 < 0.045) {
         uiMask = max(uiMask, fUIMask_TextSharpnessThreshold);
       }
     }
 
-    // Protect bottom-center HUD interaction prompt text & keycap icon (e.g. "Segure [F] para interagir!")
     if (texcoord.x >= 0.33 && texcoord.x <= 0.67 && texcoord.y >= 0.88 && texcoord.y <= 0.975) {
       if (origLuma < 0.18 || minLuma4 < 0.18 || origLuma > 0.56 || (maxLuma4 - minLuma4) > 0.20) {
         uiMask = 1.0;
       }
     }
 
-    // Protect center Pause Modal Box only when a dark modal overlay covers the center of the screen
     if (texcoord.x >= 0.24 && texcoord.x <= 0.76 && texcoord.y >= 0.18 && texcoord.y <= 0.82) {
       float3 cm0 = tex2D(SamplerSpetOrigBackBuffer, float2(0.36, 0.48)).rgb;
       float3 cm1 = tex2D(SamplerSpetOrigBackBuffer, float2(0.50, 0.48)).rgb;
@@ -1061,9 +1001,6 @@ technique KeepUI_Post {
   ];
 }
 
-/**
- * Generates ReShade.ini configured to auto-load Preset.ini and reshade-shaders/Textures/SpetLUT.png
- */
 export function buildReShadeConfigIni(presetFileName: string): string {
   const cleanPreset = presetFileName.endsWith('.ini')
     ? presetFileName
@@ -1081,4 +1018,3 @@ KeyOverlay=36,0,0,0
 KeyEffects=35,0,0,0
 `;
 }
-

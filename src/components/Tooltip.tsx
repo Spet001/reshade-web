@@ -6,9 +6,6 @@ interface TooltipProps {
   align?: 'left' | 'center' | 'right';
 }
 
-/**
- * Hover and focus-accessible industrial tooltip for ReShade shader parameters.
- */
 export const Tooltip: React.FC<TooltipProps> = ({
   content,
   children,

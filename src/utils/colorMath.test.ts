@@ -125,7 +125,6 @@ test('Reinhard Luma Preservation and Skin/Sky Protection prevent white clipping 
     srcBuf[idx + 2] = 150;
     srcBuf[idx + 3] = 255;
 
-    // Extreme red reference image
     extremeRedRefBuf[idx] = 240;
     extremeRedRefBuf[idx + 1] = 15;
     extremeRedRefBuf[idx + 2] = 15;
@@ -137,7 +136,6 @@ test('Reinhard Luma Preservation and Skin/Sky Protection prevent white clipping 
   const params = deriveReShadeParameters(srcStats, refStats, 0.9, 1.0, false);
   params.skinSkyProtection = 1.0;
 
-  // Test bright white highlight pixel [246, 246, 246]
   const [outR, outG, outB] = transformPixelThroughPipeline(246, 246, 246, srcStats, refStats, params);
   const outLab = rgbToLab(outR, outG, outB);
   assert.ok(outLab.L >= 88, `Highlight luminance should be preserved with Luma Preservation=100%, got L*=${outLab.L}`);
@@ -191,8 +189,8 @@ test('Game API resolver and PKZIP bundler produce valid ReShade bundle with DLL,
   assert.equal(sparky.architecture, '64-bit');
 
   const dllBytes = buildReShadeProxyDllStub(fnv.dllName, fnv.renderApi, fnv.architecture, fnv.title);
-  assert.equal(dllBytes[0], 0x4d); // 'M'
-  assert.equal(dllBytes[1], 0x5a); // 'Z'
+  assert.equal(dllBytes[0], 0x4d);
+  assert.equal(dllBytes[1], 0x5a);
 
   const shaderEntries = buildReShadeShaderEntries();
   assert.ok(shaderEntries.some((e) => e.path === 'reshade-shaders/Shaders/ReShade.fxh'));
@@ -208,7 +206,6 @@ test('Game API resolver and PKZIP bundler produce valid ReShade bundle with DLL,
     { path: fnv.dllName, data: dllBytes },
   ]);
 
-  // Verify PKZIP Local File Header signature (0x04034b50 = PK\x03\x04)
   assert.equal(zip[0], 0x50);
   assert.equal(zip[1], 0x4b);
   assert.equal(zip[2], 0x03);
@@ -223,7 +220,6 @@ test('3D LUT and Preset.ini maintain 1:1 mathematical parity with web preview wi
   const srcStats = analyzeImageBuffer(srcBuf, width, height);
   const psxParams = buildGenericFilterParams('psx', srcStats);
 
-  // Verify SpetLUT.png lattice vertices match transformPixelThroughPipeline 1:1 without premature quantization
   const lut = generate3DLutRgba(srcStats, srcStats, psxParams);
   const rCol = 10;
   const gRow = 18;
@@ -240,7 +236,6 @@ test('3D LUT and Preset.ini maintain 1:1 mathematical parity with web preview wi
   assert.equal(lut.data[idx + 1], expG);
   assert.equal(lut.data[idx + 2], expB);
 
-  // Verify Preset.ini wraps pipeline with KeepUI_Pre@UIMask.fx, Pixelate@Pixelate.fx, and KeepUI_Post@UIMask.fx
   assert.equal(psxParams.psxPixelScale, 2.55);
   assert.equal(psxParams.enabledShaders.Pixelate, true);
   assert.equal(psxParams.psxDitherStrength, 0.62);
@@ -259,7 +254,6 @@ test('3D LUT and Preset.ini maintain 1:1 mathematical parity with web preview wi
   assert.ok(ini.includes('iLUT_PixelScale=2.550000'));
   assert.ok(ini.includes('iDitherPixelScale=2.550000'));
 
-  // Verify no generated ReShadeFX shader uses unsupported fmod() or round() intrinsics
   const shaders = buildReShadeShaderEntries();
   assert.ok(shaders.some((s) => s.path === 'reshade-shaders/Shaders/UIMask.fx'));
   assert.ok(shaders.some((s) => s.path === 'reshade-shaders/Shaders/Pixelate.fx'));
@@ -269,7 +263,3 @@ test('3D LUT and Preset.ini maintain 1:1 mathematical parity with web preview wi
     assert.ok(!src.includes('round('), `${s.path} must not use round() in ReShadeFX`);
   }
 });
-
-
-
-

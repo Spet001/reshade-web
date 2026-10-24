@@ -24,7 +24,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Industrial-Technical Mechanical Cross-Hatch Backgrounds */
 .bg-industrial-base {
   background-color: #0B0F17;
   background-image:
@@ -63,7 +62,6 @@
     );
 }
 
-/* High-Precision Sharp-Edged Bevelled Borders */
 .bevel-panel {
   border-radius: 0px;
   background-color: #141820;
@@ -119,7 +117,6 @@
     0 20px 45px rgba(0, 0, 0, 0.75);
 }
 
-/* Custom Sharp-Edged Industrial Range Sliders */
 input[type="range"].foundry-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -151,7 +148,6 @@ input[type="range"].foundry-slider::-webkit-slider-thumb:hover {
   transform: scaleY(1.08);
 }
 
-/* Custom Industrial-Technical Scrollbar for Inspector Sidebar */
 .industrial-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #2E384D #0B0F17;

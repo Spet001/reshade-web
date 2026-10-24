@@ -290,7 +290,7 @@ export default function App() {
         )}
 
         <aside className="w-full lg:w-[380px] xl:w-[400px] bg-[#141820] bg-industrial-panel border-t lg:border-t-0 lg:border-l border-[#2A3242] shadow-[inset_1px_0_0_rgba(255,255,255,0.06)] flex flex-col min-h-0 shrink-0">
-          {/* Inspector Top Tabs (Sharp bevelled industrial tabs) */}
+
           <div className="grid grid-cols-2 gap-1.5 p-2.5 border-b border-[#2A3242] bg-[#0B0F17] shrink-0">
             <button
               type="button"
@@ -328,7 +328,7 @@ export default function App() {
           >
             {inspectorTab === 'presets' ? (
               <>
-                {/* 1. Source & Reference Upload Slots */}
+
                 <div>
                   <div className="mb-2">
                     <span className="text-xs font-medium text-[#94A3B8]">
@@ -385,7 +385,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2. Standalone Filters */}
                 <div>
                   <span className="block text-xs font-medium text-[#94A3B8] mb-2">
                     Standalone Filters
@@ -412,7 +411,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 3. Reference Comparison */}
                 <div>
                   <span className="block text-xs font-medium text-[#94A3B8] mb-2">
                     Reference Presets

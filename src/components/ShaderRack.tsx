@@ -44,7 +44,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
         </button>
       </div>
 
-      {/* 1. Reinhard CIE LAB Transfer & Skin/Sky Protection (LUT.fx) */}
       <div className="p-3 bevel-panel space-y-2.5">
         <div className="flex items-center justify-between">
           <div>
@@ -62,7 +61,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
           />
         </div>
 
-        {/* Quick Mode Buttons for Extreme References */}
         <div className="grid grid-cols-3 gap-1.5">
           <button
             type="button"
@@ -196,7 +194,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
         </div>
       </div>
 
-      {/* 2. Clarity.fx & Vibrance.fx */}
       <div className="p-3 bevel-panel space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-[#F1F5F9]">Clarity &amp; Vibrance</span>
@@ -266,7 +263,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
         </div>
       </div>
 
-      {/* 3. PSX RGB555 Hardware Dither & Pixelate.fx */}
       <div className="p-3 bevel-panel space-y-2.5">
         <div className="flex items-center justify-between">
           <div>
@@ -419,7 +415,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
         </div>
       </div>
 
-      {/* 3B. UI, Main Menu & Pause Guard (UIMask.fx) */}
       <div className="p-3 bevel-panel space-y-2.5">
         <div className="flex items-center justify-between">
           <div>
@@ -525,7 +520,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
         </div>
       </div>
 
-      {/* 4. LiftGammaGain.fx */}
       <div className="p-3 bevel-panel space-y-2">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-[#F1F5F9]">LiftGammaGain.fx</span>
@@ -582,7 +576,6 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
         </div>
       </div>
 
-      {/* 5. Levels, Curves & LumaSharpen */}
       <div className="p-3 bevel-panel space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-[#F1F5F9]">Levels &amp; Sharpness</span>
@@ -701,4 +694,3 @@ export const ShaderRack: React.FC<ShaderRackProps> = ({ params, onChange, onRese
     </div>
   );
 };
-

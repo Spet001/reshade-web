@@ -1,10 +1,3 @@
-/**
- * Game Graphics API & ReShade Hook DLL Resolver
- * Maps PC games to their exact Direct3D (d3d9.dll, d3d11.dll, d3d12.dll),
- * OpenGL (opengl32.dll), or Vulkan (vulkan-1.dll) ReShade DLL filename,
- * architecture (32-bit vs 64-bit), and target executable directory.
- */
-
 export type ReShadeDllName =
   | 'd3d9.dll'
   | 'd3d11.dll'
@@ -26,9 +19,7 @@ export interface GameApiProfile {
 }
 
 export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
-  // ============================================================================
-  // BIOWARE / CLASSIC & MODERN RPGS
-  // ============================================================================
+
   {
     title: 'Dragon Age: Origins',
     aliases: [
@@ -137,9 +128,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // CALL OF DUTY SERIES
-  // ============================================================================
   {
     title: 'Call of Duty 2',
     aliases: ['cod 2', 'cod2', 'call of duty ii'],
@@ -267,9 +255,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // SEGA / RYU GA GOTOKU (YAKUZA / LIKE A DRAGON) & ATLUS
-  // ============================================================================
   {
     title: 'Yakuza 0',
     aliases: ['yakuza 0', 'yakuza zero', 'ryu ga gotoku 0'],
@@ -398,9 +383,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // UBISOFT (ASSASSIN'S CREED, FAR CRY, SPLINTER CELL, WATCH DOGS)
-  // ============================================================================
   {
     title: "Assassin's Creed (2007)",
     aliases: ['assassins creed', 'assassins creed 1', 'assasins creed', 'assasins creed 1', 'ac1'],
@@ -584,9 +566,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // BETHESDA / OBSIDIAN / ID SOFTWARE / ARKANE
-  // ============================================================================
   {
     title: 'Fallout: New Vegas',
     aliases: ['fallout new vegas', 'new vegas', 'fnv', 'fallout nv'],
@@ -724,9 +703,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // FROMSOFTWARE / SOULSBORNE
-  // ============================================================================
   {
     title: 'Dark Souls: Prepare to Die Edition',
     aliases: ['dark souls', 'dark souls 1', 'ds1', 'dark souls ptde', 'prepare to die'],
@@ -802,9 +778,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // CD PROJEKT RED & LARIAN
-  // ============================================================================
   {
     title: 'The Witcher: Enhanced Edition',
     aliases: ['the witcher', 'the witcher 1', 'witcher 1'],
@@ -853,9 +826,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // ROCKSTAR GAMES
-  // ============================================================================
   {
     title: 'Grand Theft Auto III',
     aliases: ['gta 3', 'gta iii', 'gta3', 'grand theft auto 3'],
@@ -967,9 +937,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // VALVE / SOURCE ENGINE
-  // ============================================================================
   {
     title: 'Half-Life 2',
     aliases: ['half life 2', 'hl2'],
@@ -1052,9 +1019,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // CAPCOM & KONAMI / SURVIVAL HORROR / ACTION
-  // ============================================================================
   {
     title: 'Resident Evil 4 (2005 / UHD)',
     aliases: ['resident evil 4 2005', 're4 2005', 're4 uhd', 'resident evil 4 classic', 'biohazard 4'],
@@ -1227,9 +1191,6 @@ export const VERIFIED_GAME_API_DB: GameApiProfile[] = [
     source: 'verified-db',
   },
 
-  // ============================================================================
-  // 2K / EA / WB / SQUARE ENIX CLASSICS & MODERN
-  // ============================================================================
   {
     title: 'BioShock (2007)',
     aliases: ['bioshock', 'bioshock 1'],
@@ -1641,11 +1602,6 @@ const ROMAN_TO_ARABIC: Record<string, string> = {
   viii: '8',
 };
 
-/**
- * Normalizes a game title for deterministic comparison:
- * lowercases, strips punctuation, converts Roman numerals (II -> 2, IV -> 4, etc.),
- * and collapses consecutive identical letters in words (so "Assasins" == "Assassins").
- */
 function normalizeTitle(raw: string): string {
   return raw
     .toLowerCase()
@@ -1686,9 +1642,6 @@ function tokenMatchesFuzzy(a: string, b: string): boolean {
   return edits <= 1;
 }
 
-/**
- * Extracts sequel/edition distinguishing tokens (numbers, 'origins', 'remake', 'remastered', etc.)
- */
 function extractSpecifiers(norm: string): string[] {
   const words = norm.split(' ');
   return words.filter(
@@ -1710,15 +1663,10 @@ function extractSpecifiers(norm: string): string[] {
   );
 }
 
-/**
- * Searches VERIFIED_GAME_API_DB using normalized exact match, alias match,
- * and typo-tolerant multi-token overlap that prevents single-word false positives.
- */
 export function findVerifiedGameMatch(query: string): GameApiProfile | null {
   const normQuery = normalizeTitle(query);
   if (!normQuery) return null;
 
-  // 1. Exact match on normalized title or alias (handles "Assasins Creed IV", "Yakuza 0", "Black Ops 2")
   for (const entry of VERIFIED_GAME_API_DB) {
     if (normalizeTitle(entry.title) === normQuery) {
       return entry;
@@ -1728,7 +1676,6 @@ export function findVerifiedGameMatch(query: string): GameApiProfile | null {
     }
   }
 
-  // 2. Substring phrase containment with specifier consistency check
   const querySpecs = extractSpecifiers(normQuery);
   for (const entry of VERIFIED_GAME_API_DB) {
     const candidateStrings = [entry.title, ...(entry.aliases || [])].map(normalizeTitle);
@@ -1748,7 +1695,6 @@ export function findVerifiedGameMatch(query: string): GameApiProfile | null {
     }
   }
 
-  // 3. Strict token-overlap scoring with 1-edit typo tolerance on words >= 4 chars
   const queryTokens = normQuery.split(' ').filter((w) => w.length >= 1);
   if (queryTokens.length === 0) return null;
 
@@ -1761,7 +1707,6 @@ export function findVerifiedGameMatch(query: string): GameApiProfile | null {
       const candWords = cand.split(' ');
       const candSet = new Set(candWords);
 
-      // Check specifier compatibility first
       if (querySpecs.length > 0 && !querySpecs.every((s) => candSet.has(s))) {
         continue;
       }
@@ -1788,9 +1733,6 @@ export function findVerifiedGameMatch(query: string): GameApiProfile | null {
   return bestEntry;
 }
 
-/**
- * Local resolver against VERIFIED_GAME_API_DB + intelligent engine/franchise heuristic
- */
 export function resolveGameApiLocally(query: string): GameApiProfile {
   const trimmed = query.trim();
   if (!trimmed) {
@@ -1914,27 +1856,17 @@ export function resolveGameApiLocally(query: string): GameApiProfile {
   };
 }
 
-/**
- * Resolves any PC game's ReShade DLL and graphics API:
- * 1. Checks the curated VERIFIED_GAME_API_DB first (for exact executable paths & verified ReShade DLL).
- * 2. For unknown titles, queries PCGamingWiki's MediaWiki Parse API (wikitext infobox/API section)
- *    and maps Direct3D 9 -> d3d9.dll, Direct3D 11 -> d3d11.dll, Direct3D 12 -> d3d12.dll,
- *    Vulkan -> vulkan-1.dll, OpenGL -> opengl32.dll.
- * 3. Falls back to resolveGameApiLocally heuristics.
- */
 export async function lookupGameReShadeApi(query: string): Promise<GameApiProfile> {
   const trimmed = query.trim();
   if (!trimmed) {
     return VERIFIED_GAME_API_DB[0];
   }
 
-  // 1. Prioritize verified database match (handles Dragon Age: Origins, Black Ops 2, AC IV, Yakuza 0, Fallout 3, etc.)
   const verifiedMatch = findVerifiedGameMatch(trimmed);
   if (verifiedMatch) {
     return verifiedMatch;
   }
 
-  // 2. Live online query against PCGamingWiki MediaWiki API for uncatalogued games
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 3500);
@@ -1948,7 +1880,7 @@ export async function lookupGameReShadeApi(query: string): Promise<GameApiProfil
       const matchedPage = searchJson?.[1]?.[0];
 
       if (matchedPage) {
-        // Check if the canonical PCGamingWiki page title matches our verified DB
+
         const canonicalVerified = findVerifiedGameMatch(matchedPage);
         if (canonicalVerified) {
           clearTimeout(timer);
@@ -2020,7 +1952,7 @@ export async function lookupGameReShadeApi(query: string): Promise<GameApiProfil
     }
     clearTimeout(timer);
   } catch {
-    // Fallback to local verified database + engine heuristic
+
   }
 
   return resolveGameApiLocally(trimmed);

@@ -60,7 +60,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
   const [isSearchingApi, setIsSearchingApi] = useState(false);
   const [isPackagingZip, setIsPackagingZip] = useState(false);
 
-  // Sync when active reference preset changes defaultGameQuery
   useEffect(() => {
     if (!defaultGameQuery) return;
     setGameQuery(defaultGameQuery);
@@ -69,7 +68,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
     setSelectedDll(local.dllName);
   }, [defaultGameQuery]);
 
-  // Pre-warm official ReShade 6.8.0 binary in memory cache for instant ZIP export
   useEffect(() => {
     void fetchOfficialReShadeDllBytes(
       gameProfile.architecture,
@@ -79,12 +77,10 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
     );
   }, [gameProfile.architecture, selectedDll, gameProfile.renderApi, gameProfile.title]);
 
-  // Auto-resolve online/verified API whenever user types a game title (debounced 280ms)
   useEffect(() => {
     const trimmed = gameQuery.trim();
     if (!trimmed) return;
 
-    // Immediate local resolution so badge & select never lag behind input
     const local = resolveGameApiLocally(trimmed);
     setGameProfile(local);
     setSelectedDll(local.dllName);
@@ -247,7 +243,7 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
 
   return (
     <div className="border-t border-[#2A3242] bg-[#0B0F17] bg-industrial-base p-3.5 space-y-2.5 shrink-0">
-      {/* Live 3D LUT Strip (1024x32) */}
+
       <div>
         <div className="flex items-center justify-between text-[11px] font-medium text-[#94A3B8] mb-1">
           <span>3D LUT Strip (1024×32 · SpetLUT.png)</span>
@@ -263,7 +259,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
         </div>
       </div>
 
-      {/* Auto ReShade Version / Render API Search by Game */}
       <div className="p-2.5 bevel-panel space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-[#F1F5F9]">
@@ -325,7 +320,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
         </div>
       </div>
 
-      {/* Concise 2-Line Beginner Install Notice */}
       <div
         data-testid="reshade-install-hint"
         className="p-2 bevel-recessed text-[10px] leading-snug text-[#CBD5E1]"
@@ -338,7 +332,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
         </p>
       </div>
 
-      {/* Collapsible .INI Source Drawer */}
       {showCodeModal && (
         <div className="space-y-1.5 pt-0.5">
           <div className="flex gap-1.5">
@@ -366,7 +359,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
         </div>
       )}
 
-      {/* Primary Export Action: Auto-Packaged .ZIP Bundle */}
       <button
         type="button"
         disabled={isPackagingZip}
@@ -378,7 +370,6 @@ export const LutAndIniPanel: React.FC<LutAndIniPanelProps> = ({
           : `Export ReShade Bundle (.ZIP · INI + SpetLUT + ${selectedDll})`}
       </button>
 
-      {/* Secondary Actions (Sharp bevelled buttons, zero icon clutter) */}
       <div className="grid grid-cols-3 gap-1.5">
         <button
           type="button"

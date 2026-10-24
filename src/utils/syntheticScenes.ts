@@ -1,7 +1,3 @@
-/**
- * Practical Game Comparison Preset & Generic Filter Definitions
- */
-
 export interface CropRect {
   x: number;
   y: number;

@@ -1,14 +1,7 @@
-/**
- * Deterministic Color Science, CIE LAB Reinhard Statistical Transfer,
- * PS1 15-bit RGB555 + 4x4 Bayer Hardware Dither, Anti-Piss Filter,
- * Next-Gen PBR Filmic ACES & Local Clarity (SSAO/Micro-Contrast),
- * 3D LUT Generation, and ReShade .ini Compiler.
- */
-
 export interface LabPixel {
-  L: number; // [0..100]
-  a: number; // [-128..127]
-  b: number; // [-128..127]
+  L: number;
+  a: number;
+  b: number;
 }
 
 export interface ChannelStats {
@@ -56,50 +49,50 @@ export interface ReShadeParams {
     ClarityPBR: boolean;
     UIMask?: boolean;
   };
-  // Resolution-adaptive Pixelate.fx (scales cell size via BUFFER_HEIGHT / 720.0)
+
   pixelateResolutionScale?: boolean;
-  // UI, Main Menu & Pause Menu Protection (UIMask.fx)
-  uiMaskAutoMenu?: boolean; // Automatically bypasses shader effects on Main Menus & Pause Screens
-  uiMaskTopBar?: number; // [0.0 .. 0.15] Top menu/window bar safe zone (default 0.072)
-  uiMaskHudGuard?: number; // [0.0 .. 1.0] Protects 1px UI text, HUD & 4:3 pillarbox overlays
-  // Master blend controls
-  transferStrength: number; // 0.0 to 1.0 (0% - 100%)
-  preserveLuminance: number; // 0.0 to 1.0 (0% - 100%: preserves source L* and transfers only A/B)
-  skinSkyProtection?: number; // 0.0 to 1.0 (0% - 100%: protects highlights, skies, and skin tones from clipping)
-  // LiftGammaGain.fx
+
+  uiMaskAutoMenu?: boolean;
+  uiMaskTopBar?: number;
+  uiMaskHudGuard?: number;
+
+  transferStrength: number;
+  preserveLuminance: number;
+  skinSkyProtection?: number;
+
   rgbLift: [number, number, number];
   rgbGamma: [number, number, number];
   rgbGain: [number, number, number];
-  // Levels.fx
+
   blackPoint: number;
   whitePoint: number;
-  // Curves.fx
+
   curvesMode: number;
   curvesFormula: number;
   curvesContrast: number;
-  // Tonemap.fx
+
   tonemapGamma: number;
   tonemapExposure: number;
   tonemapSaturation: number;
   tonemapBleach: number;
   tonemapDefog: number;
   defogColor: [number, number, number];
-  // Technicolor2.fx
+
   technicolorColorStrength: [number, number, number];
   technicolorBrightness: number;
   technicolorSaturation: number;
   technicolorStrength: number;
-  // LumaSharpen.fx
+
   sharpStrength: number;
   sharpClamp: number;
   offsetBias: number;
-  // Clarity.fx / Next-Gen PBR Micro-Contrast & Vibrance
-  clarityStrength: number; // [0.0 .. 1.5] Local SSAO/Specular micro-contrast
-  vibrance: number; // [-0.5 .. 1.0] Smart chroma boost that protects skin/whites
-  // PS1 Hardware Quantization & Bayer Dither (PSX Filter)
-  psxBitDepth: number; // 5 = 15-bit RGB555 (32 levels/channel), 8 = bypass
-  psxDitherStrength: number; // 0.0 to 1.5
-  psxPixelScale: number; // 1 = native, 2 = 2x low-res texel snap
+
+  clarityStrength: number;
+  vibrance: number;
+
+  psxBitDepth: number;
+  psxDitherStrength: number;
+  psxPixelScale: number;
 }
 
 const PSX_BAYER_4X4: number[][] = [
@@ -291,9 +284,6 @@ export function analyzeImageBuffer(
   };
 }
 
-/**
- * Derives ReShade parameters from Source and Reference statistics.
- */
 export function deriveReShadeParameters(
   src: ImageColorStats,
   ref: ImageColorStats,
@@ -307,7 +297,7 @@ export function deriveReShadeParameters(
     | 'stylized-nextgen'
     | 'tactical-nextgen' = 'default'
 ): ReShadeParams {
-  // Fallout: New Vegas -> Fallout 4 (Mojave 7th-Gen Amber Filter Cleanup -> Clean Commonwealth Daylight)
+
   if (presetProfile === 'wasteland-remaster') {
     return {
       filterMode: 'none',
@@ -353,7 +343,6 @@ export function deriveReShadeParameters(
     };
   }
 
-  // Dark Souls III -> Elden Ring (Lothric Washed-Out Yellow-Ashen Haze -> Stormveil Cold Steel & Ember Gothic Contrast)
   if (presetProfile === 'gothic-nextgen') {
     return {
       filterMode: 'none',
@@ -399,7 +388,6 @@ export function deriveReShadeParameters(
     };
   }
 
-  // Specialized Next-Gen Stylization
   if (presetProfile === 'stylized-nextgen') {
     return {
       filterMode: 'none',
@@ -445,9 +433,6 @@ export function deriveReShadeParameters(
     };
   }
 
-  // Specialized Tactical Next-Gen Upgrade (e.g. COD Black Ops 2 -> Black Ops 7)
-  // Neutralizes 2012 yellow-sepia cast into natural daylight concrete & gunmetal steel
-  // while preserving full highlight and shadow detail.
   if (presetProfile === 'tactical-nextgen') {
     return {
       filterMode: 'none',
@@ -493,7 +478,6 @@ export function deriveReShadeParameters(
     };
   }
 
-  // Standard CIE LAB Reinhard Reference Match (used for Sparky -> 101 Dalmatians PS1 & Custom Reference pairs)
   const lP05Delta = ref.L.p05 - src.L.p05;
   const lP95Delta = ref.L.p95 - src.L.p95;
 
@@ -617,9 +601,6 @@ export function deriveReShadeParameters(
   };
 }
 
-/**
- * Computes a standalone Generic Filter (PSX Filter, Anti-Piss 360/PS3 Filter, or Next-Gen Filter)
- */
 export function buildGenericFilterParams(
   mode: 'psx' | 'anti-piss' | 'next-gen',
   src: ImageColorStats
@@ -739,7 +720,6 @@ export function buildGenericFilterParams(
     };
   }
 
-  // Next-Gen Filter (Balanced PBR Contrast, Gentle Warm/Olive Cast Cleanup, Soft Midtone Clarity & Vibrance)
   const yellowCast = clamp(Math.max(0, src.b.mean) / 28, 0.0, 0.65);
   return {
     filterMode: 'next-gen',
@@ -811,8 +791,7 @@ export function applyPsxHardwareQuantization(
   }
   const bx = Math.floor(x / Math.max(1, pixelScale)) & 3;
   const by = Math.floor(y / Math.max(1, pixelScale)) & 3;
-  // Calibrated 1.00 Bayer factor (with default ditherStrength=0.62 -> 0.62 * [-4..+3] = [-2.48..+1.86])
-  // Guarantees peak-to-peak Bayer span (4.34) stays well within 1 RGB555 step (8.22), preventing multi-level sky noise
+
   const ditherOffset = PSX_BAYER_4X4[by][bx] * ditherStrength * 1.00;
 
   const levels = Math.pow(2, clamp(bitDepth, 4, 8)) - 1;
@@ -826,9 +805,6 @@ export function applyPsxHardwareQuantization(
   return [quantize(r255), quantize(g255), quantize(b255)];
 }
 
-/**
- * Applies exact Reinhard CIE LAB Transfer + ReShade Shader Pipeline to an sRGB triplet [0..255]
- */
 export function transformPixelThroughPipeline(
   r255: number,
   g255: number,
@@ -849,7 +825,6 @@ export function transformPixelThroughPipeline(
     1
   );
 
-  // When LUT transfer is active and Luma Preservation is high, scale down luma-altering analytical passes
   const lumaAnalyticalDamp = hasLutTransfer ? 1.0 - preserveLuma * 0.72 : 1.0;
 
   const analyticalWeight = hasLutTransfer
@@ -860,7 +835,6 @@ export function transformPixelThroughPipeline(
     ? 0.90
     : 1.0;
 
-  // Step 1: Reinhard Statistical Color Transfer in CIE LAB (if LUT / Transfer enabled)
   if (hasLutTransfer) {
     const lab = rgbToLab(r, g, b);
     const isPsx = params.enabledShaders.PSXDither;
@@ -889,14 +863,11 @@ export function transformPixelThroughPipeline(
       (lab.b - src.b.mean) * scaleB +
       (src.b.mean + (ref.b.mean - src.b.mean) * meanShiftWeight);
 
-    // 1. Highlight / White Anti-Clipping Soft-Knee (prevents blowing out whites on extreme references)
     const highlightRollOff =
       lab.L > 72
         ? clamp(1.0 - ((lab.L - 72) / 28) * (0.45 + 0.50 * skinSkyProt), 0.12, 1.0)
         : 1.0;
 
-    // 2. Skin-Tone & Sky Hue Protection Mask in CIE LAB
-    // Natural human skin tones sit near L* [28..86], a* [4..28], b* [6..38]
     const isSkinCluster =
       lab.L >= 28 &&
       lab.L <= 86 &&
@@ -904,7 +875,7 @@ export function transformPixelThroughPipeline(
       lab.a <= 28 &&
       lab.b >= 6 &&
       lab.b <= 38;
-    // Natural sky/cloud tones sit near L* > 48 and cool blue-cyan b* < -5
+
     const isSkyCluster = lab.L >= 48 && lab.b < -5 && Math.abs(lab.a) < 22;
 
     const clusterGuard =
@@ -920,7 +891,6 @@ export function transformPixelThroughPipeline(
     let finalA = clamp(lab.a * (1 - abMix) + targetA * abMix, -128, 127);
     let finalB = clamp(lab.b * (1 - abMix) + targetB * abMix, -128, 127);
 
-    // Soft gamut compression when skinSkyProt is active so extreme references (e.g. pure red / Matrix green) never clip
     if (skinSkyProt > 0.05) {
       const maxChroma = 102 - skinSkyProt * 26 - (finalL > 80 ? (finalL - 80) * 1.4 * skinSkyProt : 0);
       const chroma = Math.hypot(finalA, finalB);
@@ -946,7 +916,6 @@ export function transformPixelThroughPipeline(
 
   const effLumaWeight = analyticalWeight * lumaAnalyticalDamp;
 
-  // Step 2: Levels.fx
   if (params.enabledShaders.Levels) {
     const bp = (params.blackPoint / 255) * effLumaWeight;
     const wp = 1.0 - (1.0 - params.whitePoint / 255) * effLumaWeight;
@@ -956,7 +925,6 @@ export function transformPixelThroughPipeline(
     bf = clamp((bf - bp) / span, 0, 1);
   }
 
-  // Step 3: LiftGammaGain.fx
   if (params.enabledShaders.LiftGammaGain) {
     const applyLGG = (c: number, liftRaw: number, gammaRaw: number, gainRaw: number) => {
       const lift = 1.0 + (liftRaw - 1.0) * effLumaWeight;
@@ -971,7 +939,6 @@ export function transformPixelThroughPipeline(
     bf = applyLGG(bf, params.rgbLift[2], params.rgbGamma[2], params.rgbGain[2]);
   }
 
-  // Step 4: Curves.fx
   if (params.enabledShaders.Curves && Math.abs(params.curvesContrast) > 0.001) {
     const effContrast = params.curvesContrast * effLumaWeight;
     const applyCurve = (x: number) => {
@@ -983,7 +950,6 @@ export function transformPixelThroughPipeline(
     bf = applyCurve(bf);
   }
 
-  // Step 5: Tonemap.fx
   if (params.enabledShaders.Tonemap) {
     const defogAmt = params.tonemapDefog * effLumaWeight;
     rf = clamp(rf - defogAmt * params.defogColor[0], 0, 1);
@@ -1003,7 +969,6 @@ export function transformPixelThroughPipeline(
     bf = clamp(luma + (bf - luma) * satMult, 0, 1);
   }
 
-  // Step 6: Vibrance.fx / ClarityPBR Selective Chroma Expansion with midtone soft-knee protection
   if (params.enabledShaders.ClarityPBR && Math.abs(params.vibrance) > 0.001) {
     const maxC = Math.max(rf, gf, bf);
     const minC = Math.min(rf, gf, bf);
@@ -1016,7 +981,6 @@ export function transformPixelThroughPipeline(
     bf = clamp(luma + (bf - luma) * vibBoost, 0, 1);
   }
 
-  // Step 7: Technicolor2.fx
   if (params.enabledShaders.Technicolor2 && params.technicolorStrength > 0.001) {
     const effTech = params.technicolorStrength * analyticalWeight;
     const tr = clamp(rf * (1.0 - params.technicolorColorStrength[0] * 0.25) * params.technicolorBrightness, 0, 1);
@@ -1087,13 +1051,6 @@ export function compileReShadeIni(
     params.psxPixelScale > 1;
   const resScaleActive = params.pixelateResolutionScale !== false ? 1 : 0;
 
-  // SpetLUT.png bakes the entire per-pixel analytical & LAB color pipeline
-  // (CIE LAB Transfer, Levels, LiftGammaGain, Curves, Tonemap, Vibrance, Technicolor2).
-  // KeepUI_Pre@UIMask.fx saves the untouched native frame first,
-  // Clarity.fx + LumaSharpen.fx sharpen the fine details BEFORE pixelation,
-  // Pixelate@Pixelate.fx applies resolution-adaptive low-res texel snapping (scaling via BUFFER_HEIGHT / 720.0),
-  // LUT.fx + Dither.fx apply 3D LUT color grading & 4x4 Bayer RGB555 quantization aligned to the pixelated texel grid,
-  // and KeepUI_Post@UIMask.fx restores crisp UI, Main Menus, and Pause Menus at the end.
   const activeTechniques: string[] = [];
   if (uiMaskActive) activeTechniques.push('KeepUI_Pre@UIMask.fx');
   if (params.enabledShaders.ClarityPBR) activeTechniques.push('Clarity@Clarity.fx');

@@ -19,11 +19,6 @@ interface SplitViewportProps {
   onViewModeChange: (mode: 'split' | 'after' | 'before' | 'reference') => void;
 }
 
-/**
- * Procedural HTML5 Canvas Backdrop: "Solar Eclipse & Industrial Foundry"
- * Renders a deep obsidian cosmos with crisp star/ember field, a curved planetary
- * copper-crimson eclipse horizon arc at the bottom, and subtle optical calibration crosshairs.
- */
 const FoundryStageBackdrop: React.FC = () => {
   const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -44,7 +39,6 @@ const FoundryStageBackdrop: React.FC = () => {
       if (!ctx) return;
       ctx.scale(dpr, dpr);
 
-      // 1. High-Contrast Slate Gray Base (#0B0F17)
       const baseGrad = ctx.createLinearGradient(0, 0, 0, h);
       baseGrad.addColorStop(0, '#0B0F17');
       baseGrad.addColorStop(0.7, '#0E131D');
@@ -52,7 +46,6 @@ const FoundryStageBackdrop: React.FC = () => {
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // 2. Subtle Mechanical Cross-Hatch Pattern across the Stage
       ctx.save();
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.022)';
       ctx.lineWidth = 1;
@@ -68,7 +61,6 @@ const FoundryStageBackdrop: React.FC = () => {
       ctx.stroke();
       ctx.restore();
 
-      // 3. Subtle Warm Solar Nebula Clouds in the Upper Cosmos
       const nebulaLeft = ctx.createRadialGradient(
         w * 0.22,
         h * 0.22,
@@ -97,7 +89,6 @@ const FoundryStageBackdrop: React.FC = () => {
       ctx.fillStyle = nebulaRight;
       ctx.fillRect(0, 0, w, h);
 
-      // 4. Deterministic Starfield & Warm Foundry Embers (seeded by golden ratio)
       const starCount = 120;
       for (let i = 0; i < starCount; i++) {
         const rx = ((i * 1.61803398875 * 97.31) % 1);
@@ -116,7 +107,6 @@ const FoundryStageBackdrop: React.FC = () => {
         ctx.fill();
       }
 
-      // 5. Atmospheric Solar Copper Glow behind the lower horizon
       const glowGrad = ctx.createRadialGradient(
         w * 0.5,
         h * 0.92,
@@ -131,18 +121,15 @@ const FoundryStageBackdrop: React.FC = () => {
       ctx.fillStyle = glowGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // 6. Curved Planetary / Solar Eclipse Horizon Rim at Bottom
       const planetRadius = Math.max(w, h) * 1.65;
       const planetCenterY = h * 0.88 + planetRadius;
       const planetCenterX = w * 0.5;
 
-      // Dark planetary body silhouette in deep slate (#080B11)
       ctx.beginPath();
       ctx.arc(planetCenterX, planetCenterY, planetRadius, 0, Math.PI * 2);
       ctx.fillStyle = '#080B11';
       ctx.fill();
 
-      // Molten Copper-Vermilion Rim Light along the planetary curve
       ctx.save();
       ctx.beginPath();
       ctx.arc(planetCenterX, planetCenterY, planetRadius, Math.PI * 1.15, Math.PI * 1.85);
@@ -198,7 +185,6 @@ export const SplitViewport: React.FC<SplitViewportProps> = ({
     const h = sourceImageData.height;
     const srcData = sourceImageData.data;
 
-    // Pass 1: Midtone Micro-Contrast (Clarity.fx)
     const pass1Out = new Uint8ClampedArray(srcData);
     if (params.enabledShaders.ClarityPBR && params.clarityStrength > 0.01) {
       const cStrength = params.clarityStrength * 0.28;
@@ -238,7 +224,6 @@ export const SplitViewport: React.FC<SplitViewportProps> = ({
       }
     }
 
-    // Pass 2: Pre-Dither Edge Acutance (LumaSharpen.fx)
     const pass2Out = new Uint8ClampedArray(pass1Out);
     if (params.enabledShaders.LumaSharpen && params.sharpStrength > 0.01) {
       const strength = params.sharpStrength * 0.65;
@@ -267,7 +252,6 @@ export const SplitViewport: React.FC<SplitViewportProps> = ({
       }
     }
 
-    // Pass 3: Resolution-Adaptive Pixelation (Pixelate.fx) + Color Grading Pipeline (LUT.fx) + 4x4 Bayer RGB555 Dither (Dither.fx)
     const finalOut = new Uint8ClampedArray(srcData.length);
     const pixelateEnabled =
       (params.enabledShaders.Pixelate ?? params.enabledShaders.PSXDither) &&
@@ -316,7 +300,6 @@ export const SplitViewport: React.FC<SplitViewportProps> = ({
       }
     }
 
-    // Pass 5: Intelligent UI, Main Menu & Pause Screen Guard (mirrors KeepUI_Post@UIMask.fx)
     if (params.enabledShaders.UIMask !== false) {
       const sampleLumaSat = (u: number, v: number) => {
         const px = Math.min(w - 1, Math.max(0, Math.floor(u * w)));
@@ -420,10 +403,9 @@ export const SplitViewport: React.FC<SplitViewportProps> = ({
       aria-label="Color Grading Viewport Stage"
       className="relative flex-1 min-h-[420px] bg-[#0B0F17] bg-industrial-base flex flex-col items-center justify-center p-4 sm:p-8 overflow-hidden select-none"
     >
-      {/* Procedural Solar Eclipse & Industrial Cross-Hatch Canvas Backdrop */}
+
       <FoundryStageBackdrop />
 
-      {/* Top-Left Viewport Mode Bar (Sharp-Edged Bevelled Housing) */}
       <div className="absolute top-3.5 left-3.5 z-20 flex flex-wrap items-center gap-1 bevel-panel bg-[#141820]/95 px-1.5 py-1">
         {(
           [
@@ -468,7 +450,6 @@ export const SplitViewport: React.FC<SplitViewportProps> = ({
         )}
       </div>
 
-      {/* Main 16:9 Viewport Frame with Sharp Bevelled Casing */}
       <div className="relative z-10 w-full max-w-5xl">
         <div
           className="relative w-full aspect-video overflow-hidden bevel-viewport cursor-ew-resize"
